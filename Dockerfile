@@ -49,6 +49,9 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
+RUN apt install -y unzip
+RUN ./ingest.sh
+
 EXPOSE 9000
 
 ENTRYPOINT ["/app/make start"]
