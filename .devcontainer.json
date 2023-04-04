@@ -1,8 +1,10 @@
 {
+    "name": "chat-with-slack",
     "dockerFile": "Dockerfile",
     "forwardPorts": [9000],
     "runArgs": ["--init"],
     "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+    "runArgs": [ "--name", "chat-with-slack"],
     "customizations": {
       // Configure properties specific to VS Code.
       "vscode": {

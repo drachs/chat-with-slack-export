@@ -6,6 +6,9 @@ ENV GOLANG_VERSION 1.19.6
 # Build Essentials
 RUN apt update && apt install -y build-essential
 
+# Some Standard Linux command line tools to inspect network environments
+RUN apt install -y net-tools iputils-ping dnsutils
+
 # Install Docker CE CLI
 RUN apt-get update \
     && apt-get install -y apt-transport-https ca-certificates curl gnupg2 lsb-release \
@@ -44,7 +47,7 @@ COPY . .
 
 #RUN go build -o microservice .
 
-pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 EXPOSE 9000
 
