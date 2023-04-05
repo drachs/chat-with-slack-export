@@ -1,21 +1,36 @@
 """Load html from files, clean up, split, ingest into Weaviate."""
 import pickle
 
-from langchain.document_loaders import ReadTheDocsLoader
+#from langchain.document_loaders import ReadTheDocsLoader
+from langchain.document_loaders import DirectoryLoader
+from langchain.document_loaders import TextLoader
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import TokenTextSplitter
 from langchain.vectorstores.faiss import FAISS
 
 
 def ingest_docs():
-    """Get documents from web pages."""
-    loader = ReadTheDocsLoader("langchain.readthedocs.io/en/latest/")
+    loader = DirectoryLoader("docs-txt", loader_cls=TextLoader)
     raw_documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
+
+    #text_splitter = RecursiveCharacterTextSplitter(
+    #    chunk_size=1000,
+    #    chunk_overlap=200,
+    #)
+    text_splitter = TokenTextSplitter(
+        chunk_size=400,
+        chunk_overlap=50,
     )
     documents = text_splitter.split_documents(raw_documents)
+
+    file = open('debug-docs.txt', 'w')
+    for doc in documents:
+        file.write(doc.metadata['source'])
+        file.write("\n")
+        file.write(doc.page_content)
+        file.write("\n\n")
+
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.from_documents(documents, embeddings)
 

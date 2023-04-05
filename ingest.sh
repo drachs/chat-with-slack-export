@@ -14,4 +14,4 @@ cd ..
 mkdir docs-txt
 python3 ./slack_archive_to_text.py
 
-#python3 ingest.py
+python3 ingest.py

@@ -51,4 +51,6 @@ def get_chain(
         question_generator=question_generator,
         callback_manager=manager,
     )
+
+    qa.top_k_docs_for_context = 8
     return qa

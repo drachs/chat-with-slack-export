@@ -50,10 +50,10 @@ for channel_name in os.listdir(jsondir):
         for json_filename in glob.glob(jsondir + '/' + channel_name + '/*.json'):
             with open(json_filename) as json_file_handle:
                 data = json.load(json_file_handle)
-                print("Parsing: "+json_filename)
+                #print("Parsing: "+json_filename)
                 for item in data:
                     if item["type"] == "message" :
-                        if item["text"].find("> has joined the channel") == -1:
+                        if item["text"].find("> has joined the channel") == -1 and item["text"].find("joined Slack — take a second to say hello.") == -1 and item["text"].find("joined Slack – take a second to say hello.") == -1:
                             user_cur = user.get(item.get("user", "Unknown User"), [u'Unknown User'])
                             #print(user_cur)
                             #ts = datetime.utcfromtimestamp(float(item['ts']))
@@ -64,5 +64,9 @@ for channel_name in os.listdir(jsondir):
                             output.write(item['text'].encode('utf-8'))
                             output.write(b"\n")
                             #csvwriter.writerow([time.encode('utf-8'),item['text'].encode('utf-8'),user_cur[0].encode('utf-8')])
-            
 
+# Remove empty files
+for file_name in os.listdir(outputdir):
+    file_name = outputdir + "/" + file_name
+    if os.path.getsize(file_name) == 0:
+        os.remove(file_name)
