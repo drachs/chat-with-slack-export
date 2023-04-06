@@ -14,6 +14,7 @@ def ingest_docs():
     loader = DirectoryLoader("docs-txt", loader_cls=TextLoader)
     raw_documents = loader.load()
 
+    print(f"Loaded {len(raw_documents)} chats...")
     #text_splitter = RecursiveCharacterTextSplitter(
     #    chunk_size=1000,
     #    chunk_overlap=200,
@@ -24,12 +25,14 @@ def ingest_docs():
     )
     documents = text_splitter.split_documents(raw_documents)
 
+    print("Writing out debug-docs.txt...")
     file = open('debug-docs.txt', 'w')
     for doc in documents:
         file.write(doc.metadata['source'])
         file.write("\n")
         file.write(doc.page_content)
         file.write("\n\n")
+    print(f"Split chats into {len(documents)} documents...")
 
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.from_documents(documents, embeddings)

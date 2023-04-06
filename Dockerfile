@@ -25,33 +25,33 @@ RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/comp
 # Python Deps
 RUN apt install -y pip
 
-# Wget, Openssh, git
-RUN apt install -y wget openssh-client git
-
-# Install Go
-#RUN wget https://golang.org/dl/go${GOLANG_VERSION}.linux-amd64.tar.gz
-#RUN tar -C /usr/local -xzf go${GOLANG_VERSION}.linux-amd64.tar.gz
-#RUN rm -f go${GOLANG_VERSION}.linux-amd64.tar.gz
-
-#ENV PATH "$PATH:/usr/local/go/bin"
+RUN apt install -y wget openssh-client git unzip
 
 LABEL base.name="chat-with-slack"
 
 WORKDIR /app
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
-#COPY go.mod go.sum ./
-#RUN go mod download && go mod verify
-
-COPY . .
-
-#RUN go build -o microservice .
-
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-RUN apt install -y unzip
-RUN ./ingest.sh
+RUN mkdir docs-json
+COPY slack-export.zip .
+RUN cd docs-json && unzip ../slack-export.zip
+
+RUN mkdir docs-txt
+COPY slack_archive_to_text.py .
+RUN python3 ./slack_archive_to_text.py
+
+COPY ingest.py .
+ARG OPENAI_API_KEY
+RUN python3 ingest.py
+
+RUN rm -rf docs-json docs-txt
+
+COPY . . 
 
 EXPOSE 9000
 
-ENTRYPOINT ["/app/make start"]
+ENV OPENAI_API_KEY=$OPENAI_API_KEY
+ENTRYPOINT ["/usr/local/bin/uvicorn",  "main:app",  "--reload",  "--port",  "9000", "--host", "0.0.0.0"]
+#ENTRYPOINT ["/bin/bash"]

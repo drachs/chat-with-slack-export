@@ -27,6 +27,7 @@ def transform_text(text):
     text = re.compile("<@U\w+>").sub(handle_mention, text)
     return text
 
+print("Converting json dumps to txt files...")
 jsondir = "docs-json"
 outputdir = "docs-txt"
 userjson = jsondir + "/users.json"
